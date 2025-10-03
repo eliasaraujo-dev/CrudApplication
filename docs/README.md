@@ -39,7 +39,7 @@ Bem-vindo à documentação completa do CrudApplication! Esta seção contém to
 - **.NET 8.0** - Framework principal
 - **ASP.NET Core MVC** - Arquitetura web
 - **Entity Framework Core** - ORM
-- **MySQL** - Banco de dados
+- **PostgreSQL** - Banco de dados
 - **Bootstrap** - Interface
 
 ### Funcionalidades

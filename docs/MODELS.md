@@ -74,13 +74,13 @@ public class Cliente
 #### Mapeamento para Banco de Dados
 
 ```sql
-CREATE TABLE Clientes (
-    IdCliente INT AUTO_INCREMENT PRIMARY KEY,
-    Nome VARCHAR(50) NOT NULL,
-    Sobrenome VARCHAR(100) NOT NULL,
-    Email VARCHAR(150) NOT NULL,
-    DataCadastro DATETIME NOT NULL,
-    Ativo BOOLEAN NOT NULL DEFAULT TRUE
+CREATE TABLE "Clientes" (
+    "IdCliente" SERIAL PRIMARY KEY,
+    "Nome" VARCHAR(50) NOT NULL,
+    "Sobrenome" VARCHAR(100) NOT NULL,
+    "Email" VARCHAR(150) NOT NULL,
+    "DataCadastro" TIMESTAMP NOT NULL,
+    "Ativo" BOOLEAN NOT NULL DEFAULT TRUE
 );
 ```
 
@@ -148,13 +148,13 @@ public class Produto
 #### Mapeamento para Banco de Dados
 
 ```sql
-CREATE TABLE Produtos (
-    IdProduto INT AUTO_INCREMENT PRIMARY KEY,
-    Nome VARCHAR(100) NOT NULL,
-    Valor DECIMAL(18,2) NOT NULL,
-    Disponivel BOOLEAN NOT NULL DEFAULT TRUE,
-    IdCliente INT NOT NULL,
-    FOREIGN KEY (IdCliente) REFERENCES Clientes(IdCliente)
+CREATE TABLE "Produtos" (
+    "IdProduto" SERIAL PRIMARY KEY,
+    "Nome" VARCHAR(100) NOT NULL,
+    "Valor" DECIMAL(18,2) NOT NULL,
+    "Disponivel" BOOLEAN NOT NULL DEFAULT TRUE,
+    "IdCliente" INTEGER NOT NULL,
+    FOREIGN KEY ("IdCliente") REFERENCES "Clientes"("IdCliente")
 );
 ```
 
@@ -215,7 +215,7 @@ public class ApplicationDbContext : DbContext
 1. **Herança**: Herda de `DbContext` do Entity Framework Core
 2. **Injeção de Dependência**: Configurado no `Program.cs`
 3. **Connection String**: Configurada via `appsettings.json`
-4. **Provedor**: MySQL usando Pomelo.EntityFrameworkCore.MySql
+4. **Provedor**: PostgreSQL usando Npgsql.EntityFrameworkCore.PostgreSQL
 
 ## 🔍 Validações e Regras de Negócio
 
@@ -398,3 +398,4 @@ public partial class InitialCreateMySql : Migration
 2. **Overposting**: Protegido por Bind attributes
 3. **Validação**: Dupla validação (cliente e servidor)
 4. **Integridade**: Constraints de banco de dados
+

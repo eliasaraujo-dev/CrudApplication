@@ -1,6 +1,6 @@
 # CrudApplication
 
-Uma aplicação web ASP.NET Core MVC para gerenciamento de clientes e produtos, desenvolvida em C# com Entity Framework Core e MySQL.
+Uma aplicação web ASP.NET Core MVC para gerenciamento de clientes e produtos, desenvolvida em C# com Entity Framework Core e PostgreSQL.
 
 ## 📋 Visão Geral
 
@@ -32,8 +32,8 @@ O CrudApplication é uma aplicação web que permite realizar operações CRUD (
 - **.NET 8.0** - Framework principal
 - **ASP.NET Core MVC** - Arquitetura web
 - **Entity Framework Core** - ORM para acesso a dados
-- **MySQL** - Banco de dados
-- **Pomelo.EntityFrameworkCore.MySql** - Provedor MySQL para EF Core
+- **PostgreSQL** - Banco de dados
+- **Npgsql.EntityFrameworkCore.PostgreSQL** - Provedor PostgreSQL para EF Core
 - **Bootstrap** - Framework CSS para interface
 - **jQuery** - JavaScript para interatividade
 
@@ -84,7 +84,7 @@ CrudApplication/
 
 ### Pré-requisitos
 - .NET 8.0 SDK
-- MySQL Server
+- PostgreSQL Server
 - Visual Studio 2022 ou VS Code
 
 ### Passos para instalação
@@ -96,13 +96,13 @@ CrudApplication/
    ```
 
 2. **Configure o banco de dados**
-   - Instale o MySQL Server
+   - Instale o PostgreSQL Server
    - Crie um banco de dados chamado `cadastrodb`
    - Atualize a connection string no `appsettings.json`:
    ```json
    {
      "ConnectionStrings": {
-       "DefaultConnection": "Server=localhost;Port=3306;Database=cadastrodb;Uid=seu_usuario;Pwd=sua_senha;"
+       "DefaultConnection": "Host=localhost;Port=5432;Database=cadastrodb;Username=seu_usuario;Password=sua_senha;"
      }
    }
    ```
@@ -189,5 +189,7 @@ Desenvolvido como exemplo de aplicação CRUD com ASP.NET Core MVC e Entity Fram
 
 ---
 
-**Versão**: 1.0.0  
-**Última atualização**: Janeiro 2025
+**Versão**: 1.1.0  
+**Última atualização**: Janeiro 2025  
+**Banco de Dados**: PostgreSQL (migrado do MySQL)
+

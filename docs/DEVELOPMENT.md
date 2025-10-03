@@ -27,13 +27,18 @@ dotnet build
 
 #### 3. Configuração do Banco de Desenvolvimento
 ```sql
+-- Conectar ao PostgreSQL
+psql -U postgres
+
 -- Criar banco de desenvolvimento
-CREATE DATABASE cadastrodb_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE cadastrodb_dev;
 
 -- Criar usuário de desenvolvimento
-CREATE USER 'dev_user'@'localhost' IDENTIFIED BY 'dev_password';
-GRANT ALL PRIVILEGES ON cadastrodb_dev.* TO 'dev_user'@'localhost';
-FLUSH PRIVILEGES;
+CREATE USER dev_user WITH PASSWORD 'dev_password';
+GRANT ALL PRIVILEGES ON DATABASE cadastrodb_dev TO dev_user;
+
+-- Sair
+\q
 ```
 
 #### 4. Configuração de Ambiente
@@ -41,7 +46,7 @@ FLUSH PRIVILEGES;
 // appsettings.Development.json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Port=3306;Database=cadastrodb_dev;Uid=dev_user;Pwd=dev_password;"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=cadastrodb_dev;Username=dev_user;Password=dev_password;"
   },
   "Logging": {
     "LogLevel": {
@@ -433,12 +438,11 @@ var clientes = await _context.Clientes
 // Program.cs
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mysqlOptions =>
+    options.UseNpgsql(connectionString, npgsqlOptions =>
     {
-        mysqlOptions.EnableRetryOnFailure(
+        npgsqlOptions.EnableRetryOnFailure(
             maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(30),
-            errorNumbersToAdd: null);
+            maxRetryDelay: TimeSpan.FromSeconds(30));
     });
     
     // Para desenvolvimento
@@ -532,7 +536,7 @@ public class ClientesController : Controller
 // appsettings.Production.json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=prod-server;Database=cadastrodb;Uid=prod_user;Pwd=secure_password;SslMode=Required;"
+    "DefaultConnection": "Host=prod-server;Database=cadastrodb;Username=prod_user;Password=secure_password;SSL Mode=Require;"
   },
   "Logging": {
     "LogLevel": {
@@ -572,20 +576,21 @@ ENTRYPOINT ["dotnet", "CrudApplication.dll"]
 ### Documentação Oficial
 - [ASP.NET Core MVC](https://docs.microsoft.com/aspnet/core/mvc/)
 - [Entity Framework Core](https://docs.microsoft.com/ef/core/)
-- [MySQL para .NET](https://dev.mysql.com/doc/connector-net/en/)
+- [PostgreSQL para .NET](https://www.npgsql.org/doc/)
 
 ### Ferramentas
 - [Entity Framework Tools](https://docs.microsoft.com/ef/core/cli/dotnet)
 - [ASP.NET Core Scaffolding](https://docs.microsoft.com/aspnet/core/fundamentals/tools/dotnet-aspnet-codegenerator)
-- [MySQL Workbench](https://dev.mysql.com/downloads/workbench/)
+- [pgAdmin](https://www.pgadmin.org/download/)
 
 ### Extensões VS Code
 - C# for Visual Studio Code
-- MySQL
+- PostgreSQL
 - REST Client
 - Thunder Client
 
 ### Extensões Visual Studio
 - Entity Framework Core Power Tools
-- MySQL for Visual Studio
+- PostgreSQL for Visual Studio
 - Web Essentials
+

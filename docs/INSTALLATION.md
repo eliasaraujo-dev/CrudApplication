@@ -7,13 +7,13 @@
 | Software | Versão Mínima | Descrição |
 |----------|---------------|-----------|
 | .NET 8.0 SDK | 8.0.0 | Framework de desenvolvimento |
-| MySQL Server | 8.0+ | Banco de dados |
+| PostgreSQL Server | 13.0+ | Banco de dados |
 | Visual Studio 2022 | 17.8+ | IDE (opcional) |
 | VS Code | 1.80+ | Editor alternativo |
 
 ### Ferramentas Recomendadas
 
-- **MySQL Workbench**: Interface gráfica para MySQL
+- **pgAdmin**: Interface gráfica para PostgreSQL
 - **Git**: Controle de versão
 - **Postman**: Teste de APIs (para futuras implementações)
 
@@ -62,36 +62,35 @@ sudo apt-get install -y dotnet-sdk-8.0
 dotnet --version
 ```
 
-## 🗄️ Instalação do MySQL
+## 🗄️ Instalação do PostgreSQL
 
 ### Windows
 
 1. **Download**:
-   - Acesse: https://dev.mysql.com/downloads/mysql/
-   - Baixe MySQL Community Server 8.0+
+   - Acesse: https://www.postgresql.org/download/windows/
+   - Baixe PostgreSQL 13+ para Windows
 
 2. **Instalação**:
    - Execute o instalador
-   - Escolha "Developer Default"
-   - Configure senha do root
+   - Configure senha do usuário postgres
    - Complete a instalação
 
 3. **Verificação**:
    ```cmd
-   mysql --version
+   psql --version
    ```
 
 ### macOS
 
 ```bash
 # Via Homebrew
-brew install mysql
+brew install postgresql
 
 # Iniciar serviço
-brew services start mysql
+brew services start postgresql
 
-# Configurar segurança
-mysql_secure_installation
+# Criar usuário
+createuser -s postgres
 ```
 
 ### Linux (Ubuntu/Debian)
@@ -100,14 +99,15 @@ mysql_secure_installation
 # Atualizar pacotes
 sudo apt update
 
-# Instalar MySQL Server
-sudo apt install mysql-server
+# Instalar PostgreSQL
+sudo apt install postgresql postgresql-contrib
 
-# Configurar segurança
-sudo mysql_secure_installation
+# Iniciar serviço
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
 
 # Verificar status
-sudo systemctl status mysql
+sudo systemctl status postgresql
 ```
 
 ## 📥 Instalação do Projeto
@@ -127,19 +127,18 @@ cd CrudApplication
 #### Criar Banco de Dados
 
 ```sql
--- Conectar ao MySQL como root
-mysql -u root -p
+-- Conectar ao PostgreSQL como postgres
+psql -U postgres
 
 -- Criar banco de dados
-CREATE DATABASE cadastrodb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE cadastrodb;
 
 -- Criar usuário específico (opcional)
-CREATE USER 'cruduser'@'localhost' IDENTIFIED BY 'senha_segura';
-GRANT ALL PRIVILEGES ON cadastrodb.* TO 'cruduser'@'localhost';
-FLUSH PRIVILEGES;
+CREATE USER cruduser WITH PASSWORD 'senha_segura';
+GRANT ALL PRIVILEGES ON DATABASE cadastrodb TO cruduser;
 
--- Sair do MySQL
-EXIT;
+-- Sair do psql
+\q
 ```
 
 #### Configurar Connection String
@@ -149,7 +148,7 @@ Edite o arquivo `appsettings.json`:
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Port=3306;Database=cadastrodb;Uid=root;Pwd=sua_senha_aqui;"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=cadastrodb;Username=postgres;Password=sua_senha_aqui;"
   },
   "Logging": {
     "LogLevel": {
@@ -166,7 +165,7 @@ Edite o arquivo `appsettings.json`:
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Port=3306;Database=cadastrodb;Uid=root;Pwd=sua_senha_aqui;"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=cadastrodb;Username=postgres;Password=sua_senha_aqui;"
   },
   "Logging": {
     "LogLevel": {
@@ -206,19 +205,19 @@ dotnet ef database update
 
 ```sql
 -- Conectar ao banco
-mysql -u root -p cadastrodb
+psql -U postgres -d cadastrodb
 
 -- Verificar tabelas criadas
-SHOW TABLES;
+\dt
 
 -- Verificar estrutura da tabela Clientes
-DESCRIBE Clientes;
+\d "Clientes"
 
 -- Verificar estrutura da tabela Produtos
-DESCRIBE Produtos;
+\d "Produtos"
 
 -- Sair
-EXIT;
+\q
 ```
 
 ## 🚀 Executando a Aplicação
@@ -294,15 +293,16 @@ Configure níveis de log em `appsettings.json`:
 
 ### Problemas Comuns
 
-#### 1. Erro de Conexão com MySQL
+#### 1. Erro de Conexão com PostgreSQL
 
-**Erro**: `Unable to connect to any of the specified MySQL hosts`
+**Erro**: `Unable to connect to any of the specified PostgreSQL hosts`
 
 **Soluções**:
-- Verificar se MySQL está rodando: `sudo systemctl status mysql`
-- Verificar porta: padrão é 3306
+- Verificar se PostgreSQL está rodando: `sudo systemctl status postgresql`
+- Verificar porta: padrão é 5432
 - Verificar credenciais na connection string
 - Verificar firewall
+- Verificar arquivo `pg_hba.conf` para autenticação
 
 #### 2. Erro de Migração
 
@@ -325,8 +325,9 @@ dotnet ef database update
 
 **Soluções**:
 - Verificar usuário e senha
-- Verificar privilégios do usuário no MySQL
-- Usar usuário root temporariamente
+- Verificar privilégios do usuário no PostgreSQL
+- Usar usuário postgres temporariamente
+- Configurar `pg_hba.conf` para trust local
 
 #### 4. Porta em Uso
 
@@ -353,11 +354,11 @@ dotnet --version
 # Verificar se EF Tools está instalado
 dotnet ef --version
 
-# Verificar status do MySQL
-sudo systemctl status mysql
+# Verificar status do PostgreSQL
+sudo systemctl status postgresql
 
-# Testar conexão MySQL
-mysql -u root -p -e "SELECT VERSION();"
+# Testar conexão PostgreSQL
+psql -U postgres -c "SELECT version();"
 
 # Verificar logs da aplicação
 dotnet run --verbosity detailed
@@ -368,7 +369,7 @@ dotnet run --verbosity detailed
 ### Checklist de Verificação
 
 - [ ] .NET 8.0 SDK instalado e funcionando
-- [ ] MySQL Server instalado e rodando
+- [ ] PostgreSQL Server instalado e rodando
 - [ ] Banco de dados `cadastrodb` criado
 - [ ] Connection string configurada
 - [ ] Pacotes NuGet restaurados
@@ -392,7 +393,7 @@ dotnet run --verbosity detailed
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Port=3306;Database=cadastrodb;Uid=usuario_dedicado;Pwd=senha_forte;SslMode=Required;"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=cadastrodb;Username=usuario_dedicado;Password=senha_forte;SSL Mode=Require;"
   }
 }
 ```
@@ -403,7 +404,7 @@ Para produção, use variáveis de ambiente:
 
 ```bash
 # Definir variáveis
-export ConnectionStrings__DefaultConnection="Server=prod-server;Database=cadastrodb;Uid=prod_user;Pwd=senha_super_segura;"
+export ConnectionStrings__DefaultConnection="Host=prod-server;Database=cadastrodb;Username=prod_user;Password=senha_super_segura;SSL Mode=Require;"
 
 # Executar aplicação
 dotnet run
@@ -412,8 +413,8 @@ dotnet run
 ### Firewall
 
 ```bash
-# Liberar porta MySQL (se necessário)
-sudo ufw allow 3306
+# Liberar porta PostgreSQL (se necessário)
+sudo ufw allow 5432
 
 # Liberar porta da aplicação
 sudo ufw allow 5031
@@ -426,7 +427,7 @@ sudo ufw allow 5031
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Port=3306;Database=cadastrodb;Uid=user;Pwd=pass;Pooling=true;MinimumPoolSize=5;MaximumPoolSize=100;"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=cadastrodb;Username=user;Password=pass;Pooling=true;MinPoolSize=5;MaxPoolSize=100;"
   }
 }
 ```
@@ -443,6 +444,42 @@ sudo ufw allow 5031
     }
   }
 }
+```
+
+## 🐳 Docker (Opcional)
+
+### Dockerfile já incluído
+
+O projeto já inclui um `Dockerfile` configurado para deploy em containers.
+
+### Docker Compose para Desenvolvimento
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: cadastrodb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: senha123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "5031:80"
+    depends_on:
+      - postgres
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=cadastrodb;Username=postgres;Password=senha123;"
+
+volumes:
+  postgres_data:
 ```
 
 ## 📝 Próximos Passos

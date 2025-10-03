@@ -30,7 +30,7 @@ O CrudApplication segue o padrão arquitetural **MVC (Model-View-Controller)** d
 ┌─────────────────────────────────────────────────────────────┐
 │                    CAMADA DE DADOS                          │
 ├─────────────────────────────────────────────────────────────┤
-│  MySQL Database   │  Migrations        │  Entity Relations  │
+│  PostgreSQL DB    │  Migrations        │  Entity Relations  │
 │  - cadastrodb     │  - InitialCreate   │  - Cliente → Produto│
 │  - Clientes Table │  - Schema Updates  │  - Foreign Keys    │
 │  - Produtos Table │  - Data Seeding    │  - Constraints     │
@@ -93,34 +93,34 @@ public class ApplicationDbContext : DbContext
 
 ### 3. Camada de Dados (Data Layer)
 
-#### Banco de Dados MySQL
-- **Servidor**: MySQL Server
+#### Banco de Dados PostgreSQL
+- **Servidor**: PostgreSQL Server
 - **Banco**: `cadastrodb`
-- **Porta**: 3306 (padrão)
+- **Porta**: 5432 (padrão)
 
 #### Estrutura das Tabelas
 
 **Tabela Clientes**
 ```sql
-CREATE TABLE Clientes (
-    IdCliente INT AUTO_INCREMENT PRIMARY KEY,
-    Nome VARCHAR(50) NOT NULL,
-    Sobrenome VARCHAR(100) NOT NULL,
-    Email VARCHAR(150) NOT NULL UNIQUE,
-    DataCadastro DATETIME NOT NULL,
-    Ativo BOOLEAN NOT NULL DEFAULT TRUE
+CREATE TABLE "Clientes" (
+    "IdCliente" SERIAL PRIMARY KEY,
+    "Nome" VARCHAR(50) NOT NULL,
+    "Sobrenome" VARCHAR(100) NOT NULL,
+    "Email" VARCHAR(150) NOT NULL UNIQUE,
+    "DataCadastro" TIMESTAMP NOT NULL,
+    "Ativo" BOOLEAN NOT NULL DEFAULT TRUE
 );
 ```
 
 **Tabela Produtos**
 ```sql
-CREATE TABLE Produtos (
-    IdProduto INT AUTO_INCREMENT PRIMARY KEY,
-    Nome VARCHAR(100) NOT NULL,
-    Valor DECIMAL(18,2) NOT NULL,
-    Disponivel BOOLEAN NOT NULL DEFAULT TRUE,
-    IdCliente INT NOT NULL,
-    FOREIGN KEY (IdCliente) REFERENCES Clientes(IdCliente)
+CREATE TABLE "Produtos" (
+    "IdProduto" SERIAL PRIMARY KEY,
+    "Nome" VARCHAR(100) NOT NULL,
+    "Valor" DECIMAL(18,2) NOT NULL,
+    "Disponivel" BOOLEAN NOT NULL DEFAULT TRUE,
+    "IdCliente" INTEGER NOT NULL,
+    FOREIGN KEY ("IdCliente") REFERENCES "Clientes"("IdCliente")
 );
 ```
 
@@ -184,14 +184,14 @@ sequenceDiagram
 ```xml
 <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9" />
 <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
-<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
 ```
 
 ### Injeção de Dependência
 ```csharp
 // Program.cs
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddControllersWithViews();
 ```
@@ -202,7 +202,7 @@ builder.Services.AddControllersWithViews();
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Port=3306;Database=cadastrodb;Uid=root;Pwd=;"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=cadastrodb;Username=postgres;Password=;"
   }
 }
 ```
@@ -274,3 +274,4 @@ dotnet ef migrations remove
 - 🔄 Implementar cache
 - 🔄 Adicionar testes unitários
 - 🔄 Implementar API REST
+

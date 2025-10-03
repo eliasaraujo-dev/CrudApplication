@@ -625,3 +625,4 @@ Para implementar uma API REST completa:
 4. **Implementar Swagger/OpenAPI**
 5. **Adicionar Versionamento de API**
 6. **Implementar Rate Limiting**
+
